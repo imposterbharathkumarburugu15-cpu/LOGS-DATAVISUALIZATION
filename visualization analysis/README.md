@@ -28,7 +28,7 @@ Data is cleaned and analyzed
 Graphs are generated and saved
 
 Project Structure
-visualization analysis/
+visualization_analysis/
 ├── main.py
 ├── loader.py
 ├── selector.py
@@ -61,5 +61,6 @@ Distribution graph
 All outputs are saved in the outputs folder.
 
 Conclusion
+
 
 This project shows how Python can be used to analyze CSV data using NumPy, Pandas, and Matplotlib in a simple and practical way.
