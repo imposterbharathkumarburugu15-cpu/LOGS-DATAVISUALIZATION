@@ -1,26 +1,22 @@
 import numpy as np
 import pandas as pd
-def error_trend(df):
-    error_df = df[df["level"] == "ERROR"]
-    trend = error_df.groupby(
-        error_df["timestamp"].dt.date
-    ).size()
-    return trend
 
+def basic_statistics(arr):
+    return {
+        "mean": np.mean(arr),
+        "std": np.std(arr),
+        "min": np.min(arr),
+        "max": np.max(arr)
+    }
 
-def detect_error_anomalies(trend, z_threshold=3):
-
-    values = trend.values.astype(float)
-
-    mean = np.mean(values)
-    std = np.std(values)
+def detect_anomalies(arr, z_threshold=3):
+    mean = np.mean(arr)
+    std = np.std(arr)
 
     if std == 0:
-        return trend, pd.Series(dtype=float)
+        return pd.Series(dtype=float)
 
-    z_scores = (values - mean) / std
-    anomaly_mask = np.abs(z_scores) > z_threshold
+    z_scores = (arr - mean) / std
+    anomalies = arr[abs(z_scores) > z_threshold]
 
-    anomalies = trend[anomaly_mask]
-
-    return trend, anomalies
+    return anomalies

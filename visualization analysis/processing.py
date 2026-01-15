@@ -1,6 +1,9 @@
 import numpy as np
 
-def compute_log_frequencies(df):
-    levels = df["level"].values
-    unique, counts = np.unique(levels, return_counts=True)
-    return dict(zip(unique, counts))
+def clean_numeric_series(series):
+    arr = series.to_numpy(dtype=float)
+
+    mean = np.nanmean(arr)
+    arr = np.where(np.isnan(arr), mean, arr)
+
+    return arr

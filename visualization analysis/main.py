@@ -1,55 +1,53 @@
-from loader import load_user_data
-from processing import compute_log_frequencies
-from analysis import error_trend
-from visualization import plot_log_levels, plot_error_trend
-from analysis import error_trend, detect_error_anomalies
-from visualization import plot_error_anomalies
+from loader import load_csv_any_format
+from selector import select_numeric_column
+from processing import clean_numeric_series
+from analysis import basic_statistics, detect_anomalies
+from visualization import plot_series, plot_distribution
 
 import os
+import pandas as pd
 
 def main():
     print("Choose data source:")
-    print("1. Use sample log file")
-    print("2. Provide your own CSV file path")
+    print("1. Use sample CSV")
+    print("2. Provide your own CSV file")
 
     choice = input("Enter choice (1/2): ").strip()
 
     if choice == "1":
-        path = "data/sample_logs.csv"
-        print("Using sample log file.")
+        path = "data/sample_any.csv"
     elif choice == "2":
-        path = input("Enter path to your CSV file: ").strip()
+        path = input("Enter CSV file path: ")
     else:
-        print("Invalid choice. Exiting.")
+        print("Invalid choice.")
         return
 
-    try:
-        df = load_user_data(path)
-    except ValueError as e:
-        print(e)
-        return
+    df = load_csv_any_format(path)
 
-    print("Data loaded successfully:", df.shape)
+    print("\nCSV Loaded Successfully")
+    print("Columns:", list(df.columns))
 
+    column = select_numeric_column(df)
 
-    freq = compute_log_frequencies(df)
-    trend = error_trend(df)
+    arr = clean_numeric_series(df[column])
+
+    stats = basic_statistics(arr)
+    anomalies = detect_anomalies(arr)
 
     os.makedirs("outputs", exist_ok=True)
-    df.to_csv("outputs/processed_logs.csv", index=False)
+    pd.DataFrame({"value": arr}).to_csv("outputs/processed_data.csv", index=False)
 
-    plot_log_levels(freq)
-    plot_error_trend(trend)
-    print("Sample rows:")
-    print(df.head())
-    trend = error_trend(df)
-    trend, anomalies = detect_error_anomalies(trend)
+    plot_series(arr, column)
+    plot_distribution(arr, column)
+ 
 
-    plot_error_anomalies(trend, anomalies)
 
-    print("\nAnalysis complete.")
-    print("Processed data saved to outputs/processed_logs.csv")
-    print("Plots saved in outputs/plots/")
+
+    print("\nAnalysis Complete")
+    print("Statistics:", stats)
+    
+    print("Anomalies detected:", len(anomalies))
+    print("Outputs saved in outputs/ folder")
 
 if __name__ == "__main__":
- main()
+    main()
